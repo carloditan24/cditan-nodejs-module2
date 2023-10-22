@@ -1,0 +1,32 @@
+{
+  "name": "cditan-nodejs-module2",
+  "version": "1.0.0",
+  "description": "Trainees will build a foundational Express.js application interfacing with MongoDB. The application will simulate real-time data ingestion, have CRUD functionalities, and send notifications (email or SMS) when sensor data hits certain thresholds. Proper logging, data validation, and error handling will be integral parts of the project.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "fix": "npm run fix:eslint && npm run fix:prettier",
+    "fix:eslint": "eslint --fix .",
+    "fix:prettier": "prettier --write .",
+    "lint": "npm run lint:eslint && npm run lint:prettier",
+    "lint:eslint": "eslint --cache --cache-location node_modules --report-unused-disable-directives --max-warnings 1 .",
+    "lint:prettier": "prettier --check ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.6.3",
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.2",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.52.0",
+    "eslint-config-stratpoint": "^3.0.0",
+    "eslint-plugin-mocha": "^10.2.0",
+    "nodemon": "^3.0.1",
+    "prettier": "3.0.3"
+  }
+}
