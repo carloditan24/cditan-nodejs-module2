@@ -17,16 +17,19 @@ checkThresholds();
 
 app.use(express.json());
 
+app.use(loggerMiddleware);
+
 app.use("/api/sensor", sensorRoutes);
 
 const swaggerSpec = swaggerJsDoc(swaggerDef);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+if (process.env.NODE_ENV !== "production") {
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
 
 app.use((req, res, next) => {
   res.status(404).json({ message: "Not found." });
 });
-
-app.use(loggerMiddleware);
 
 app.use(handleError);
 const PORT = process.env.PORT || 3000;
