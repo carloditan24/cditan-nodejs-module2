@@ -25,6 +25,9 @@ A simulation THP (Temperature, Humidity, Pressure) Sensor API for notifying via 
     TWILIO_AUTH_TOKEN=<your auth token>
     TWILIO_PHONE_NUMBER=<your twilio phone number as sender>
     SAMPLE_RECIPIENT_MOBILE_NUMBER=<recipient for notifications>
+    TEMP_THRESHOLD=25
+    HUMIDITY_THRESHOLD=75
+    PRESSURE_THRESHOLD=1000
     ```
 
     Note that your MongoDB database must be created first before you can proceed, and also have your Twilio account set up.
