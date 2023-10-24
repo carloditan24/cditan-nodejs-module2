@@ -1,12 +1,20 @@
 const EventEmitter = require("events");
 const logger = require("./../config/winston-config");
 const { formatDateTime, remapItem } = require("./../utils");
+const twilio = require("twilio");
 
 class ThresholdNotificationService {
-  constructor(twilioClient, thresholds) {
-    this.twilioClient = twilioClient;
+  constructor() {
+    this.twilioClient = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
     this.thresholdEmitter = new EventEmitter();
-    this.thresholds = thresholds;
+    this.thresholds = {
+      temperatureCelsius: parseFloat(process.env.TEMP_THRESHOLD),
+      humidityPercent: parseFloat(process.env.HUMIDITY_THRESHOLD),
+      pressureHpa: parseFloat(process.env.PRESSURE_THRESHOLD),
+    };
 
     this.thresholdEmitter.on("trigger", (message) => {
       this.twilioClient.messages

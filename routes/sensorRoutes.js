@@ -5,7 +5,9 @@ const {
   validatePaginationInput,
   validateSensorDataInput,
 } = require("./../middleware/validations/sensorDataValidation");
+
 const { remapItem } = require("./../utils");
+const ThresholdNotificationService = require("../utils/threshold-notification");
 /**
  * @swagger
  * /api/sensor:
@@ -42,7 +44,10 @@ router.post("/", validateSensorDataInput, async (req, res, next) => {
   });
 
   try {
-    await sensorData.save();
+    const savedData = await sensorData.save();
+
+    const notifService = new ThresholdNotificationService();
+    notifService.checkSensorDataIfBeyondThreshold(savedData);
     return res.status(201).json();
   } catch (err) {
     return res.status(400).json({ message: err.message });

@@ -38,29 +38,23 @@ function generateSensorData() {
 }
 
 // Scheduled task for sensor data simulation
-// This cron job is set to run every 10 minutes. You can adjust the timing as needed.
-initializeTwilioClient().then((twilioClient) => {
-  const notifService = new ThresholdNotificationService(twilioClient, {
-    temperatureCelsius: 25,
-    humidityPercent: 40,
-    pressureHpa: 1000,
-  });
+// This cron job is set to run every minute. You can adjust the timing as needed.
+const notifService = new ThresholdNotificationService();
 
-  cron.schedule("* * * * *", async function () {
-    console.log("Generating simulated sensor data...");
+cron.schedule("* * * * *", async function () {
+  console.log("Generating simulated sensor data...");
 
-    // Create new sensor data
-    const newSensorData = generateSensorData();
+  // Create new sensor data
+  const newSensorData = generateSensorData();
 
-    // Save this data to your database
-    try {
-      const data = await newSensorData.save();
-      console.log("Simulated data inserted:", data);
-      notifService.checkSensorDataIfBeyondThreshold(data);
-    } catch (err) {
-      console.error("Error inserting simulated data:", err);
-    }
-  });
+  // Save this data to your database
+  try {
+    const data = await newSensorData.save();
+    console.log("Simulated data inserted:", data);
+    notifService.checkSensorDataIfBeyondThreshold(data);
+  } catch (err) {
+    console.error("Error inserting simulated data:", err);
+  }
 });
 
 // Keep the script running

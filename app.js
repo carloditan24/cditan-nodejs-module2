@@ -8,8 +8,12 @@ const handleError = require("./middleware/errorMiddleware");
 const loggerMiddleware = require("./middleware/loggerMiddleware");
 const sensorRoutes = require("./routes/sensorRoutes");
 const swaggerDef = require("./config//swagger-config");
+const initializeTwilioClient = require("./config/twilio");
+const checkThresholds = require("./config/thresholds");
 
 connectDB();
+initializeTwilioClient();
+checkThresholds();
 
 app.use(express.json());
 

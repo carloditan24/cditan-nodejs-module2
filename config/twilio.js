@@ -15,8 +15,6 @@ const initializeTwilioClient = async () => {
     const twilioClient = twilio(accountSid, authToken);
 
     await twilioClient.api.v2010.accounts(accountSid).fetch();
-
-    return twilioClient;
   } catch (err) {
     logger.error(err);
     process.exit(1);
