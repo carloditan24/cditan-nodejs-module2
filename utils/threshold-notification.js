@@ -16,7 +16,7 @@ class ThresholdNotificationService {
       pressureHpa: parseFloat(process.env.PRESSURE_THRESHOLD),
     };
 
-    this.thresholdEmitter.on("trigger", (message) => {
+    this.thresholdEmitter.on("trigger", (id, message) => {
       this.twilioClient.messages
         .create({
           body: message,
@@ -24,7 +24,9 @@ class ThresholdNotificationService {
           to: process.env.SAMPLE_RECIPIENT_MOBILE_NUMBER,
         })
         .then((message) => {
-          console.log("Message sent with SID:", message.sid);
+          logger.info(
+            `Message sent for Sensor data ${id} with SID: ${message.sid}`
+          );
         });
     });
   }
@@ -40,12 +42,21 @@ class ThresholdNotificationService {
 
     if (sensorData.temperatureCelsius > temperatureCelsius) {
       message += `Temperature above ${temperatureCelsius}°C.\n`;
+      logger.info(
+        `Temperature threshold hit for ${sensorData._id}. Threshold: ${temperatureCelsius} Value: ${sensorData.temperatureCelsius}`
+      );
     }
     if (sensorData.humidityPercent > humidityPercent) {
       message += `Humidity percentage above ${humidityPercent}%.\n`;
+      logger.info(
+        `Humidity threshold hit for ${sensorData._id}. Threshold: ${humidityPercent} Value: ${sensorData.humidityPercent}`
+      );
     }
     if (sensorData.pressureHpa > pressureHpa) {
       message += `Pressure above ${pressureHpa} hPa.\n`;
+      logger.info(
+        `Pressure threshold hit for ${sensorData._id}. Threshold: ${pressureHpa} Value: ${sensorData.pressureHpa}`
+      );
     }
 
     const sensorDataString = [
@@ -57,7 +68,11 @@ class ThresholdNotificationService {
     ].join("\n");
 
     if (message) {
-      this.thresholdEmitter.emit("trigger", `${message}\n${sensorDataString}`);
+      this.thresholdEmitter.emit(
+        "trigger",
+        sensorData._id,
+        `${message}\n${sensorDataString}`
+      );
       return;
     }
   }
