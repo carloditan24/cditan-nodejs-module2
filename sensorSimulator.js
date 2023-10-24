@@ -1,6 +1,7 @@
 const cron = require("node-cron");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const ThresholdNotificationService = require("./utils/threshold-notification");
 
 // Load environment variables
 dotenv.config();
@@ -37,20 +38,26 @@ function generateSensorData() {
 
 // Scheduled task for sensor data simulation
 // This cron job is set to run every 10 minutes. You can adjust the timing as needed.
-cron.schedule("*/10 * * * *", function () {
+
+const notifService = new ThresholdNotificationService();
+const emitter = notifService.getEmitter();
+
+cron.schedule("* * * * *", async function () {
   console.log("Generating simulated sensor data...");
 
   // Create new sensor data
   const newSensorData = generateSensorData();
 
   // Save this data to your database
-  newSensorData.save((err, doc) => {
-    if (err) {
-      console.error("Error inserting simulated data:", err);
-    } else {
-      console.log("Simulated data inserted:", doc);
+  try {
+    const data = await newSensorData.save();
+    console.log("Simulated data inserted:", data);
+    if (newSensorData.temperatureCelsius > 25) {
+      emitter.emit("trigger", "Temperature exceeded 25°C.");
     }
-  });
+  } catch (err) {
+    console.error("Error inserting simulated data:", err);
+  }
 });
 
 // Keep the script running
