@@ -106,11 +106,12 @@ router.get("/", validatePaginationInput, async (req, res, next) => {
     {},
     "timestamp location temperatureCelsius humidityPercent pressureHpa"
   )
+    .lean()
     .sort({ timestamp: -1 })
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json(sensorData.map(({ _doc }) => remapItem(_doc)));
+  res.status(200).json(sensorData.map((item) => remapItem(item)));
 });
 
 /**
@@ -150,13 +151,13 @@ router.get("/:id", async (req, res, next) => {
   const item = await SensorData.findById(
     id,
     "timestamp location temperatureCelsius humidityPercent pressureHpa"
-  );
+  ).lean();
 
   if (!item) {
     return res.status(404).json({ message: "Sensor data not found." });
   }
 
-  res.status(200).json(remapItem(item._doc));
+  res.status(200).json(remapItem(item));
 });
 
 /**
