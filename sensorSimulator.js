@@ -2,6 +2,7 @@ const cron = require("node-cron");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const ThresholdNotificationService = require("./utils/threshold-notification");
+const initializeTwilioClient = require("./config/twilio");
 
 // Load environment variables
 dotenv.config();
@@ -38,26 +39,28 @@ function generateSensorData() {
 
 // Scheduled task for sensor data simulation
 // This cron job is set to run every 10 minutes. You can adjust the timing as needed.
+initializeTwilioClient().then((twilioClient) => {
+  const notifService = new ThresholdNotificationService(twilioClient, {
+    temperatureCelsius: 25,
+    humidityPercent: 40,
+    pressureHpa: 1000,
+  });
 
-const notifService = new ThresholdNotificationService();
-const emitter = notifService.getEmitter();
+  cron.schedule("* * * * *", async function () {
+    console.log("Generating simulated sensor data...");
 
-cron.schedule("* * * * *", async function () {
-  console.log("Generating simulated sensor data...");
+    // Create new sensor data
+    const newSensorData = generateSensorData();
 
-  // Create new sensor data
-  const newSensorData = generateSensorData();
-
-  // Save this data to your database
-  try {
-    const data = await newSensorData.save();
-    console.log("Simulated data inserted:", data);
-    if (newSensorData.temperatureCelsius > 25) {
-      emitter.emit("trigger", "Temperature exceeded 25°C.");
+    // Save this data to your database
+    try {
+      const data = await newSensorData.save();
+      console.log("Simulated data inserted:", data);
+      notifService.checkSensorDataIfBeyondThreshold(data);
+    } catch (err) {
+      console.error("Error inserting simulated data:", err);
     }
-  } catch (err) {
-    console.error("Error inserting simulated data:", err);
-  }
+  });
 });
 
 // Keep the script running

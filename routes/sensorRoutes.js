@@ -37,7 +37,7 @@ router.post("/", validateSensorDataInput, async (req, res, next) => {
     timestamp: new Date(),
     location: data.location,
     temperatureCelsius: data.temperatureCelsius,
-    humidityPercentage: data.humidityPercentage,
+    humidityPercent: data.humidityPercent,
     pressureHpa: data.pressureHpa,
   });
 
@@ -99,7 +99,7 @@ router.get("/", validatePaginationInput, async (req, res, next) => {
 
   const sensorData = await SensorData.find(
     {},
-    "timestamp location temperatureCelsius humidityPercentage pressureHpa"
+    "timestamp location temperatureCelsius humidityPercent pressureHpa"
   )
     .sort({ timestamp: -1 })
     .skip(skip)
@@ -144,7 +144,7 @@ router.get("/:id", async (req, res, next) => {
 
   const item = await SensorData.findById(
     id,
-    "timestamp location temperatureCelsius humidityPercentage pressureHpa"
+    "timestamp location temperatureCelsius humidityPercent pressureHpa"
   );
 
   if (!item) {
@@ -264,7 +264,7 @@ router.delete("/:id", async (req, res, next) => {
  *        temperatureCelsius:
  *          type: number
  *          format: float
- *        humidityPercentage:
+ *        humidityPercent:
  *          type: number
  *          format: float
  *        pressureHpa:
@@ -275,7 +275,7 @@ router.delete("/:id", async (req, res, next) => {
  *        timestamp: "2023-10-24T12:00:00Z"
  *        location: "Living Room"
  *        temperatureCelsius: 22.5
- *        humidityPercentage: 45.0
+ *        humidityPercent: 45.0
  *        pressureHpa: 1013.2
  *    SensorDataRequest:
  *      type: object
@@ -285,7 +285,7 @@ router.delete("/:id", async (req, res, next) => {
  *        temperatureCelsius:
  *          type: number
  *          format: float
- *        humidityPercentage:
+ *        humidityPercent:
  *          type: number
  *          format: float
  *        pressureHpa:
@@ -294,7 +294,7 @@ router.delete("/:id", async (req, res, next) => {
  *      example:
  *        location: "Living Room"
  *        temperatureCelsius: 22.5
- *        humidityPercentage: 45.0
+ *        humidityPercent: 45.0
  *        pressureHpa: 1013.2
  *    ValidationErrors:
  *       type: array

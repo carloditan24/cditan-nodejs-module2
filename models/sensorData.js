@@ -14,7 +14,7 @@ const sensorDataValidationSchema = z
       invalid_type_error: "Temperature must be a number.",
       required: "Temperature celsius is required.",
     }),
-    humidityPercentage: z.number({
+    humidityPercent: z.number({
       invalid_type_error: "Humidity percentage must be a number.",
       required: "Humidity percentage celsius is required.",
     }),
