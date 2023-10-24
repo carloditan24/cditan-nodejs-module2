@@ -5,7 +5,7 @@ const {
   validatePaginationInput,
   validateSensorDataInput,
 } = require("./../middleware/validations/sensorDataValidation");
-
+const { remapItem } = require("./../utils");
 /**
  * @swagger
  * /api/sensor:
@@ -99,22 +99,163 @@ router.get("/", validatePaginationInput, async (req, res, next) => {
 
   const sensorData = await SensorData.find(
     {},
-    "-_id timestamp location temperatureCelsius humidityPercentage pressureHpa"
+    "timestamp location temperatureCelsius humidityPercentage pressureHpa"
   )
     .sort({ timestamp: -1 })
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json(sensorData);
+  res.status(200).json(sensorData.map(({ _doc }) => remapItem(_doc)));
+});
+
+/**
+ * @swagger
+ * /api/sensor/{id}:
+ *   get:
+ *     summary: Get sensor data by ID.
+ *     description: Retrieves sensor data by ID.
+ *     tags:
+ *       - Sensor Data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the sensor data to retrieve.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Sensor data retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SensorData'
+ *       404:
+ *         description: Sensor data not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ *             example:
+ *               message: 'Sensor data not found.'
+ */
+router.get("/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  const item = await SensorData.findById(
+    id,
+    "timestamp location temperatureCelsius humidityPercentage pressureHpa"
+  );
+
+  if (!item) {
+    return res.status(404).json({ message: "Sensor data not found." });
+  }
+
+  res.status(200).json(remapItem(item._doc));
+});
+
+/**
+ * @swagger
+ * /api/sensor/{id}:
+ *   put:
+ *     summary: Update sensor data by ID.
+ *     description: Updates sensor data by ID.
+ *     tags:
+ *       - Sensor Data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the sensor data to update.
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SensorDataRequest'
+ *     responses:
+ *       204:
+ *         description: Sensor data updated successfully.
+ *       400:
+ *         description: Validation error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrors'
+ *       404:
+ *         description: Sensor data not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
+router.put("/:id", validateSensorDataInput, async (req, res, next) => {
+  const id = req.params.id;
+
+  const updatedItem = await SensorData.updateOne({ _id: id }, req.body);
+
+  if (updatedItem.matchedCount) {
+    res.status(204).json();
+  } else {
+    res.status(404).json({ message: "Sensor data not found." });
+  }
+});
+
+/**
+ * @swagger
+ * /api/sensor/{id}:
+ *   delete:
+ *     summary: Delete sensor data by ID.
+ *     description: Deletes sensor data by ID.
+ *     tags:
+ *       - Sensor Data
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the sensor data to delete.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       204:
+ *         description: Sensor data deleted successfully.
+ *       404:
+ *         description: Sensor data not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMessage'
+ */
+router.delete("/:id", async (req, res, next) => {
+  const id = req.params.id;
+
+  const deletedItem = await SensorData.deleteOne({ _id: id });
+
+  if (deletedItem.deletedCount) {
+    res.status(204).json();
+  } else {
+    res.status(404).json({ message: "Sensor data not found." });
+  }
 });
 
 /**
  * @swagger
  * components:
  *  schemas:
+ *    ErrorMessage:
+ *      type: object
+ *      properties:
+ *        message:
+ *          type: string
+ *      example:
+ *        message: "Sensor data not found."
  *    SensorData:
  *      type: object
  *      properties:
+ *        id:
+ *          type: string
  *        timestamp:
  *          type: string
  *          format: date-time
@@ -130,6 +271,7 @@ router.get("/", validatePaginationInput, async (req, res, next) => {
  *          type: number
  *          format: float
  *      example:
+ *        id: "6536ee0116f300dd3b5f743b"
  *        timestamp: "2023-10-24T12:00:00Z"
  *        location: "Living Room"
  *        temperatureCelsius: 22.5

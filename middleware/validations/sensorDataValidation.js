@@ -31,6 +31,7 @@ const validatePaginationInput = (req, res, next) => {
       ),
     });
     paginationSchema.parse(req.query);
+    next();
   } catch (err) {
     return res.status(400).json(errorSchema.parse(err.issues));
   }
