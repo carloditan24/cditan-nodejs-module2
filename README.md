@@ -30,7 +30,7 @@ A simulation THP (Temperature, Humidity, Pressure) Sensor API for notifying via 
     PRESSURE_THRESHOLD=1000
     ```
 
-    Note that your MongoDB database must be created first before you can proceed, and also have your Twilio account set up.
+    Note that your MongoDB database must be created first before you can proceed, and also have your Twilio account set up. Threshold values should be defined as well, as this is a requirement for sending notifications based on incoming sensor data values.
 
 3. Start the server:
 
@@ -50,6 +50,6 @@ From your codebase directory in your terminal, run the following
 node sensorData.js
 ```
 
-This will insert random sensor data to the databbase every minute and if the data contains info that goes beyond threshold on any of the three indicators, it will send an SMS notification.
+This will insert random sensor data to the database every minute and if the data contains info that goes beyond threshold on any of the three indicators, it will send an SMS notification.
 
 ---
