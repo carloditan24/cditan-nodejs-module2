@@ -1,3 +1,9 @@
+/**
+ * For remapping _doc object to convert _id to id attribute and carry-over remaining key-value pairs
+ *
+ * @param {object} item The _doc object from document instance
+ * @returns Remapped object with id
+ */
 const remapItem = (item) => {
   const { _id, ...rest } = item;
   return {
@@ -6,6 +12,12 @@ const remapItem = (item) => {
   };
 };
 
+/**
+ * For converting ISO timestamp to human readable format
+ *
+ * @param {string} timestamp ISO 8601 timestamp
+ * @returns Date time format in YYYY/MM/DD HH:MM:SS(AM/PM) format
+ */
 const formatDateTime = (timestamp) => {
   const date = new Date(
     timestamp.toLocaleString("en-US", { timeZone: "Asia/Manila" })
